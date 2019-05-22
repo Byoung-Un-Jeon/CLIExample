@@ -6,12 +6,14 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-
+import java.io.File;
 public class Runner {
 	
 	String path;
 	boolean verbose;
 	boolean help;
+	String fullpath;
+	boolean fullPathCheck;
 
 	public static void main(String[] args) {
 
@@ -22,6 +24,7 @@ public class Runner {
 
 	private void run(String[] args) {
 		Options options = createOptions();
+		int numOfFiles = 0;
 		
 		if(parseOptions(options, args)){
 			if (help){
@@ -29,14 +32,29 @@ public class Runner {
 				return;
 			}
 			
+			File file = new File(path);
+			
 			// path is required (necessary) data so no need to have a branch.
 			System.out.println("You provided \"" + path + "\" as the value of the option p");
 			
 			// TODO show the number of files in the path
+			while(numOfFiles != file.list().length) {
+				numOfFiles++;
+			}
+			
+			if(fullPathCheck) {
+				fullpath = file.getAbsolutePath();
+				System.out.println("Full Path : " + fullpath);
+			}
+			
+			System.out.println("Number of Files : " + numOfFiles);
 			
 			if(verbose) {
 				
 				// TODO list all files in the path
+				for(String fileName:file.list()) {
+					System.out.println(fileName);
+				}
 				
 				System.out.println("Your program is terminated. (This message is shown because you turned on -v option!");
 			}
@@ -53,6 +71,7 @@ public class Runner {
 			path = cmd.getOptionValue("p");
 			verbose = cmd.hasOption("v");
 			help = cmd.hasOption("h");
+			fullPathCheck = cmd.hasOption("f");
 
 		} catch (Exception e) {
 			printHelp(options);
@@ -66,6 +85,14 @@ public class Runner {
 	private Options createOptions() {
 		Options options = new Options();
 
+		// add options by using OptionBuilder
+		options.addOption(Option.builder("f").longOpt("fullpath")
+				.desc("Print out full path of the files in the directory")
+				//.hasArg()
+				.argName("Print out full path")
+				//.required()
+				.build());
+		
 		// add options by using OptionBuilder
 		options.addOption(Option.builder("p").longOpt("path")
 				.desc("Set a path of a directory or a file to display")
