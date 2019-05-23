@@ -6,14 +6,17 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+
 import java.io.File;
+
 public class Runner {
 	
 	String path;
+	String fullPath;
+	boolean fullPathOption;
 	boolean verbose;
 	boolean help;
-	String fullpath;
-	boolean fullPathCheck;
+	int numOfFiles = 0;
 
 	public static void main(String[] args) {
 
@@ -24,7 +27,6 @@ public class Runner {
 
 	private void run(String[] args) {
 		Options options = createOptions();
-		int numOfFiles = 0;
 		
 		if(parseOptions(options, args)){
 			if (help){
@@ -38,22 +40,21 @@ public class Runner {
 			System.out.println("You provided \"" + path + "\" as the value of the option p");
 			
 			// TODO show the number of files in the path
-			while(numOfFiles != file.list().length) {
+			for(String temp : file.list()) {
 				numOfFiles++;
 			}
+			System.out.println("number of files in the path : " + numOfFiles);
 			
-			if(fullPathCheck) {
-				fullpath = file.getAbsolutePath();
-				System.out.println("Full Path : " + fullpath);
+			if(fullPathOption) {
+				fullPath = file.getAbsolutePath();
+				System.out.println("Full Path : " + fullPath);
 			}
-			
-			System.out.println("Number of Files : " + numOfFiles);
 			
 			if(verbose) {
 				
 				// TODO list all files in the path
-				for(String fileName:file.list()) {
-					System.out.println(fileName);
+				for(String temp : file.list()) {
+					System.out.println(temp);
 				}
 				
 				System.out.println("Your program is terminated. (This message is shown because you turned on -v option!");
@@ -71,7 +72,7 @@ public class Runner {
 			path = cmd.getOptionValue("p");
 			verbose = cmd.hasOption("v");
 			help = cmd.hasOption("h");
-			fullPathCheck = cmd.hasOption("f");
+			fullPathOption = cmd.hasOption("f");
 
 		} catch (Exception e) {
 			printHelp(options);
@@ -84,12 +85,11 @@ public class Runner {
 	// Definition Stage
 	private Options createOptions() {
 		Options options = new Options();
-
-		// add options by using OptionBuilder
+		
 		options.addOption(Option.builder("f").longOpt("fullpath")
-				.desc("Print out full path of the files in the directory")
-				//.hasArg()
-				.argName("Print out full path")
+				.desc("print out full path of the files in the directory")
+				.hasArg()
+				.argName("set a path to show the number of files")
 				//.required()
 				.build());
 		
